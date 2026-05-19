@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "seed": "node src/seed/seedCars.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
@@ -16,4 +17,3 @@
     "mongodb": "^6.0.0"
   }
 }
-
