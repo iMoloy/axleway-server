@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3100")
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim());
 
@@ -48,3 +48,5 @@ app.use((error, req, res, next) => {
 app.listen(port, () => {
   console.log(`AxleWay server listening on port ${port}`);
 });
+
+export default app;

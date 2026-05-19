@@ -28,7 +28,7 @@ Create `.env` from `.env.example`.
 ```env
 PORT=5000
 NODE_ENV=development
-CLIENT_URL=http://localhost:3100
+CLIENT_URL=http://localhost:3000
 MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net
 DB_NAME=axleway
 JWT_SECRET=replace_with_a_long_secret
@@ -37,7 +37,7 @@ JWT_SECRET=replace_with_a_long_secret
 For multiple client URLs, separate them with commas:
 
 ```env
-CLIENT_URL=http://localhost:3100,https://axleway.vercel.app
+CLIENT_URL=http://localhost:3000,https://axleway.vercel.app
 ```
 
 ## API Routes
