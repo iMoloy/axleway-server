@@ -3,6 +3,7 @@ import { getCollection } from "../config/db.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { getObjectId } from "../utils/objectId.js";
+import { hasRequiredFields, isPositiveNumber } from "../utils/validation.js";
 
 const router = express.Router();
 
@@ -16,6 +17,16 @@ router.get("/", verifyToken, asyncHandler(async (req, res) => {
 }));
 
 router.post("/", verifyToken, asyncHandler(async (req, res) => {
+  const requiredFields = ["carId", "carName", "totalPrice", "driverNeeded"];
+
+  if (!hasRequiredFields(req.body, requiredFields)) {
+    return res.status(400).send({ message: "Missing required booking fields" });
+  }
+
+  if (!isPositiveNumber(req.body.totalPrice)) {
+    return res.status(400).send({ message: "Total price must be a positive number" });
+  }
+
   const carId = getObjectId(req.body.carId);
   if (!carId) {
     return res.status(400).send({ message: "Invalid car id" });
