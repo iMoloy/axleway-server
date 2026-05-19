@@ -61,6 +61,7 @@ CLIENT_URL=http://localhost:3100,https://axleway.vercel.app
 
 - `GET /bookings`
 - `POST /bookings`
+- `DELETE /bookings/:id`
 
 ## Local Development
 

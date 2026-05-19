@@ -40,4 +40,37 @@ router.post("/", verifyToken, asyncHandler(async (req, res) => {
   res.send(result);
 }));
 
+router.delete("/:id", verifyToken, asyncHandler(async (req, res) => {
+  const bookingId = getObjectId(req.params.id);
+  if (!bookingId) {
+    return res.status(400).send({ message: "Invalid booking id" });
+  }
+
+  const bookings = await getCollection("bookings");
+  const cars = await getCollection("cars");
+  const booking = await bookings.findOne({
+    _id: bookingId,
+    userEmail: req.user.email
+  });
+
+  if (!booking) {
+    return res.status(404).send({ message: "Booking not found" });
+  }
+
+  const result = await bookings.deleteOne({
+    _id: bookingId,
+    userEmail: req.user.email
+  });
+
+  const carId = getObjectId(booking.carId);
+  if (carId) {
+    await cars.updateOne(
+      { _id: carId },
+      { $inc: { bookingCount: -1 } }
+    );
+  }
+
+  res.send(result);
+}));
+
 export default router;
