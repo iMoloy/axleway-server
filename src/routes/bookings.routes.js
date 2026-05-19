@@ -1,36 +1,43 @@
 import express from "express";
-import { ObjectId } from "mongodb";
 import { getCollection } from "../config/db.js";
 import { verifyToken } from "../middleware/verifyToken.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { getObjectId } from "../utils/objectId.js";
 
 const router = express.Router();
 
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", verifyToken, asyncHandler(async (req, res) => {
   const bookings = await getCollection("bookings");
   const result = await bookings
     .find({ userEmail: req.user.email })
     .sort({ bookingDate: -1 })
     .toArray();
   res.send(result);
-});
+}));
 
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", verifyToken, asyncHandler(async (req, res) => {
+  const carId = getObjectId(req.body.carId);
+  if (!carId) {
+    return res.status(400).send({ message: "Invalid car id" });
+  }
+
   const bookings = await getCollection("bookings");
   const cars = await getCollection("cars");
   const booking = {
     ...req.body,
+    carId: req.body.carId,
+    totalPrice: Number(req.body.totalPrice),
     userEmail: req.user.email,
     bookingDate: new Date()
   };
 
   const result = await bookings.insertOne(booking);
   await cars.updateOne(
-    { _id: new ObjectId(req.body.carId) },
+    { _id: carId },
     { $inc: { bookingCount: 1 } }
   );
 
   res.send(result);
-});
+}));
 
 export default router;
-

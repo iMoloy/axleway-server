@@ -10,9 +10,19 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim());
 
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Not allowed by CORS"));
+  },
   credentials: true
 }));
 app.use(express.json());
@@ -26,7 +36,15 @@ app.use("/auth", authRoutes);
 app.use("/cars", carRoutes);
 app.use("/bookings", bookingRoutes);
 
+app.use((req, res) => {
+  res.status(404).send({ message: "Route not found" });
+});
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  res.status(500).send({ message: "Internal server error" });
+});
+
 app.listen(port, () => {
   console.log(`AxleWay server listening on port ${port}`);
 });
-
