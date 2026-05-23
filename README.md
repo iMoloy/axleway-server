@@ -94,4 +94,4 @@ DB_NAME=axleway
 JWT_SECRET=replace_with_a_long_secret
 ```
 
-After deployment, update the client `NEXT_PUBLIC_API_URL` in Vercel with the live server URL.
+After deployment, update the client `VITE_API_URL` in Vercel with `/api` (or the live server URL if not using proxy).
