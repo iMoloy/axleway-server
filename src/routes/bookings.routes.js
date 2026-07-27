@@ -7,6 +7,15 @@ import { hasRequiredFields, isPositiveNumber } from "../utils/validation.js";
 
 const router = express.Router();
 
+router.get("/car/:carId", asyncHandler(async (req, res) => {
+  const bookings = await getCollection("bookings");
+  const result = await bookings
+    .find({ carId: req.params.carId })
+    .project({ startDate: 1, endDate: 1, _id: 0 })
+    .toArray();
+  res.send(result);
+}));
+
 router.get("/", verifyToken, asyncHandler(async (req, res) => {
   const bookings = await getCollection("bookings");
   const result = await bookings
@@ -17,7 +26,7 @@ router.get("/", verifyToken, asyncHandler(async (req, res) => {
 }));
 
 router.post("/", verifyToken, asyncHandler(async (req, res) => {
-  const requiredFields = ["carId", "carName", "totalPrice", "driverNeeded"];
+  const requiredFields = ["carId", "carName", "totalPrice", "driverNeeded", "startDate", "endDate"];
 
   if (!hasRequiredFields(req.body, requiredFields)) {
     return res.status(400).send({ message: "Missing required booking fields" });
@@ -34,6 +43,21 @@ router.post("/", verifyToken, asyncHandler(async (req, res) => {
 
   const bookings = await getCollection("bookings");
   const cars = await getCollection("cars");
+
+  // Double-Booking Overlap Guard: check if car is already booked within the requested dates
+  const { startDate, endDate } = req.body;
+  const existingOverlap = await bookings.findOne({
+    carId: req.body.carId,
+    startDate: { $lte: endDate },
+    endDate: { $gte: startDate }
+  });
+
+  if (existingOverlap) {
+    return res.status(409).send({
+      message: `Car is already booked from ${existingOverlap.startDate} to ${existingOverlap.endDate}. Please choose different dates.`
+    });
+  }
+
   const booking = {
     ...req.body,
     carId: req.body.carId,
