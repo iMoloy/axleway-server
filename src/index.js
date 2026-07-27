@@ -5,6 +5,7 @@ import express from "express";
 import authRoutes from "./routes/auth.routes.js";
 import bookingRoutes from "./routes/bookings.routes.js";
 import carRoutes from "./routes/cars.routes.js";
+import paymentRoutes from "./routes/payments.routes.js";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/cars", carRoutes);
 app.use("/bookings", bookingRoutes);
+app.use("/payments", paymentRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
